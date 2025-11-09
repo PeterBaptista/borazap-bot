@@ -6,21 +6,17 @@ import { WhatsAppMessagesService } from '../whatsapp/whatsapp-messages.service'
 
 export const IA_ACTIVATE_BUTTON_ID = 'ia-activate'
 export class WebhookService {
-
   private webhook: WhatsAppWebhook
-
 
   private waId?: string
   private text?: string
 
-  private whatsappMessageService: WhatsAppMessagesService;
+  private whatsappMessageService: WhatsAppMessagesService
   private messageType?: WhatsAppWebhookMessageType
   private buttonId?: string
   private buttonTitle?: string
 
   constructor(webhook: WhatsAppWebhook) {
-
-
     this.whatsappMessageService = new WhatsAppMessagesService()
     this.webhook = webhook
     this.waId = this.webhook?.entry?.[0]?.changes?.[0]?.value?.contacts?.[0]?.wa_id
@@ -76,9 +72,6 @@ export class WebhookService {
     return { action: 'proceed' }
   }
 
-
-
-
   async handleWebhook() {
     const { action } = this.handleEmptyMessage()
 
@@ -86,19 +79,14 @@ export class WebhookService {
 
     console.log('Webhook recebido:', JSON.stringify(this.webhook, null, 2))
 
-
-    
-
-    if(!this.waId) {
-      console.error("Cannot find waId")
+    if (!this.waId) {
+      console.error('Cannot find waId')
       return
     }
-     this.whatsappMessageService.sendTextMessage(
-      {
-        to: this.waId ?? "",
-        message: "Oi, safado!"
-      }
-     )
+    this.whatsappMessageService.sendTextMessage({
+      to: this.waId ?? '',
+      message: 'Oi, safado!',
+    })
     // Qualquer outra mensagem, não faz nada
     console.log('Mensagem recebida, mas nenhuma ação configurada:')
     return { action: 'noop' }

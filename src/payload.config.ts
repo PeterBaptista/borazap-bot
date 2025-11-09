@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url'
 import { Media } from './collections/Media'
 import QRCodeGlobal from './collections/QrCode'
 import { Users } from './collections/Users'
+import { Chats } from './collections/Chats'
+import { Messages } from './collections/TodoMessages'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,7 +28,7 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Users, Media],
+  collections: [Users, Media, Chats, Messages],
   globals: [QRCodeGlobal],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

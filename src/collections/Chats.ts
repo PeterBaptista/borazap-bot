@@ -29,10 +29,10 @@ export const Chats: CollectionConfig = {
       name: 'type',
       type: 'select',
       required: true,
-      defaultValue: 'bot-flow',
+      defaultValue: 'ai',
       options: [
         { label: 'AI', value: 'ai' },
-        { label: 'bot-flow', value: 'bot-flow' },
+        
       ],
     },
     {
