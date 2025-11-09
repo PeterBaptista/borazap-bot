@@ -23,7 +23,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as WhatsAppWebhook
 
- 
+    const webhookService = new WebhookService(body)
+
+    await webhookService.handleWebhook()
 
     // Sempre responde 200 pro WhatsApp
     return NextResponse.json({ status: 'ok' }, { status: 200 })

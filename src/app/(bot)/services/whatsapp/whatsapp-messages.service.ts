@@ -25,10 +25,7 @@ export class WhatsAppMessagesService {
     buttons: WhatsAppButtonType[]
   }) {
     try {
-      console.log('to', to)
-      console.log('message', message)
-      console.log('footer', footer)
-      console.log('buttons', buttons)
+
 
       const body = {
         messaging_product: 'whatsapp',

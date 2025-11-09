@@ -1,28 +1,27 @@
 // services/webhook.service.ts
 
-import { Chat, UserMessage } from '@/payload-types'
+import axios from 'axios'
 import { WhatsAppWebhook, WhatsAppWebhookMessageType } from '../../types/whatsapp-type'
-import { TextGenerationService } from '../ai-messages/text-generation.service'
-import { BotFlowService } from '../bot-flow/bot-flow.service'
-import { ChatService } from '../chat/chat.service'
-import { UserMessagesService } from '../user-messages/user-messages.service'
+import { WhatsAppMessagesService } from '../whatsapp/whatsapp-messages.service'
 
 export const IA_ACTIVATE_BUTTON_ID = 'ia-activate'
 export class WebhookService {
-  private botFlowService: BotFlowService
+
   private webhook: WhatsAppWebhook
-  private userMessagesService: UserMessagesService
+
+
   private waId?: string
   private text?: string
-  private chatService: ChatService
+
+  private whatsappMessageService: WhatsAppMessagesService;
   private messageType?: WhatsAppWebhookMessageType
   private buttonId?: string
   private buttonTitle?: string
 
   constructor(webhook: WhatsAppWebhook) {
-    this.botFlowService = new BotFlowService()
-    this.chatService = new ChatService()
-    this.userMessagesService = new UserMessagesService()
+
+
+    this.whatsappMessageService = new WhatsAppMessagesService()
     this.webhook = webhook
     this.waId = this.webhook?.entry?.[0]?.changes?.[0]?.value?.contacts?.[0]?.wa_id
     this.text = this.webhook?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body
@@ -77,49 +76,8 @@ export class WebhookService {
     return { action: 'proceed' }
   }
 
-  async handleInteractiveMessages(chat: Chat) {
-    if (chat.status === 'new') {
-      return await this.botFlowService.handleFirstMessage({ waId: this.waId ?? '' })
-    }
-    if (chat.status === 'active' && this.buttonId === IA_ACTIVATE_BUTTON_ID) {
-      await this.chatService.updateChatType(chat.id, 'ai')
-      return await this.botFlowService.handleFlow({
-        waId: this.waId ?? '',
-        nextFlowId: this.buttonId ?? '',
-      })
-    }
-    if (chat.status === 'active' && chat.type === 'bot-flow') {
-      return await this.botFlowService.handleFlow({
-        waId: this.waId ?? '',
-        nextFlowId: this.buttonId ?? '',
-      })
-    }
-    if (chat.status === 'inactive') {
-      await this.chatService.activateChat(chat.id)
-      return await this.botFlowService.handleComebackMessage({ waId: this.waId ?? '' })
-    }
-    return { action: 'noop' }
-  }
 
-  async handleTextMessages(chat: Chat, userMessage: UserMessage) {
-    if (chat.status === 'new') {
-      await this.chatService.activateChat(chat.id)
-      return await this.botFlowService.handleFirstMessage({ waId: this.waId ?? '' })
-    }
-    if (chat.status === 'active' && chat.type === 'ai') {
-      return await this.botFlowService.handleAIResponse({
-        waId: this.waId ?? '',
-        prompt: this.text ?? '',
-        userQuestionId: userMessage.id,
-        chatId: chat.id,
-      })
-    }
-    if (chat.status === 'inactive') {
-      await this.chatService.activateChat(chat.id)
-      await this.botFlowService.handleComebackMessage({ waId: this.waId ?? '' })
-      return this.botFlowService.handleFirstMessage({ waId: this.waId ?? '' })
-    }
-  }
+
 
   async handleWebhook() {
     const { action } = this.handleEmptyMessage()
@@ -128,24 +86,19 @@ export class WebhookService {
 
     console.log('Webhook recebido:', JSON.stringify(this.webhook, null, 2))
 
-    const chat = await this.chatService.getChatByWaId(this.waId ?? '')
-    if (!chat) {
-      return { action: 'noop' }
-    }
 
-    const userMessage = await this.userMessagesService.createUserMessage({
-      chatId: chat.id,
-      content: this.text ?? this.buttonTitle ?? '',
-      type: this.messageType,
-    })
+    
 
-    if (this.messageType === 'text') {
-      return await this.handleTextMessages(chat, userMessage)
+    if(!this.waId) {
+      console.error("Cannot find waId")
+      return
     }
-    if (this.messageType === 'interactive') {
-      return await this.handleInteractiveMessages(chat)
-    }
-
+     this.whatsappMessageService.sendTextMessage(
+      {
+        to: this.waId ?? "",
+        message: "Oi, safado!"
+      }
+     )
     // Qualquer outra mensagem, não faz nada
     console.log('Mensagem recebida, mas nenhuma ação configurada:')
     return { action: 'noop' }
