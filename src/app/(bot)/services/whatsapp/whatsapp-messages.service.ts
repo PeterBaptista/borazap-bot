@@ -25,8 +25,6 @@ export class WhatsAppMessagesService {
     buttons: WhatsAppButtonType[]
   }) {
     try {
-
-
       const body = {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',

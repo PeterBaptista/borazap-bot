@@ -1,16 +1,15 @@
 import {
-  pgTable,
-  index,
-  uniqueIndex,
-  serial,
-  varchar,
-  timestamp,
-  numeric,
   foreignKey,
+  index,
   integer,
   jsonb,
+  numeric,
+  pgTable,
+  serial,
+  timestamp,
+  uniqueIndex,
+  varchar,
 } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
 
 export const media = pgTable(
   'media',
